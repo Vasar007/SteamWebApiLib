@@ -22,7 +22,7 @@ namespace SteamWebApiLib
     /// get response several times (you can specify attempts number in config). If no response was 
     /// received or an error code was received, an exception will be thrown.
     /// </summary>
-    public sealed class SteamApiClient
+    public sealed class SteamApiClient : IDisposable
     {
         /// <summary>
         /// An HTTP client to use if pooling connections.
@@ -33,6 +33,11 @@ namespace SteamWebApiLib
         /// Contains additional data which client uses in requests.
         /// </summary>
         private readonly SteamApiConfig _config;
+
+        /// <summary>
+        /// Flag to detect redundant dispose calls.
+        /// </summary>
+        private bool _disposedValue;
 
 
         /// <summary>
@@ -320,6 +325,23 @@ namespace SteamWebApiLib
                 return package;
             }
         }
+
+        #region IDisposable Implementation
+
+        /// <summary>
+        /// Clears managed resources. This class disposes only <see cref="HttpClient" />.
+        /// </summary>
+        public void Dispose()
+        {
+            if (!_disposedValue)
+            {
+                _disposedValue = true;
+
+                _httpClient.Dispose();
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets retry policy of client based on config.
