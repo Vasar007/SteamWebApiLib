@@ -8,6 +8,8 @@
     <owners>$author$</owners>
     <licenseUrl>https://github.com/Vasar007/SteamWebApiLib/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>$projectUrl$</projectUrl>
+    <repositoryUrl>$repositoryUrl$</repositoryUrl>
+    <repositoryType>$repositoryType$</repositoryType>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
@@ -15,6 +17,7 @@
     <dependencies>
       <group targetFramework=".NETStandard2.0">
         <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers" />
+        <dependency id="Polly" version="7.1.0" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>
