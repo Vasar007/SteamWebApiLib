@@ -15,8 +15,8 @@ before_build:
 - cmd: dotnet restore
 
 after_build:
-- dotnet pack "SteamWebApiLib" -c Release
 - dotnet test
+- dotnet pack "SteamWebApiLib" -c Release
 
 artifacts:
 - path: SteamWebApiLib\bin\Release\*.nupkg
