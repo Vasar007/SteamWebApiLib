@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Vasily Vasilyev</Authors>
+    <Product>SteamWebApiLib</Product>
+    <Description>SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods to retrieve various data from the Steam API. Lib can interact with Steam Strorefront API and Steam Web API (each API provides different set of data).
+
+The Steam API is not officially available or documented, all data in this library was either compiled by trial and error from the inofficial API documentation, and is therefore provided as-is.</Description>
+    <PackageTags>api-wrapper, steam-api, steam-web-api, steam-webapi, steamapi, steamwebapi, valve, steam</PackageTags>
+    <RepositoryUrl>https://github.com/Vasar007/SteamWebApiLib</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Polly" Version="7.1.0" />
+  </ItemGroup>
+
+</Project>
