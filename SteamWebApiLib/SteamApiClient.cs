@@ -54,7 +54,6 @@ namespace SteamWebApiLib
         /// <summary>
         /// Retrieves all available applications in Steam Store (including DLL, VR apps and e.t.c.).
         /// </summary>  
-        /// <param name="request">A set of parameters for request.</param>
         /// <param name="token">Propogates notification that operation should be cancelled.</param>
         /// <returns>List of app identifiers and its names.</returns>
         public async Task<SteamAppBriefInfoList> GetAppListAsync(CancellationToken token = default)
