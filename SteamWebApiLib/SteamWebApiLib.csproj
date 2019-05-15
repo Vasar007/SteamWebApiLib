@@ -10,11 +10,16 @@
 The Steam API is not officially available or documented, all data in this library was either compiled by trial and error from the inofficial API documentation, and is therefore provided as-is.</Description>
     <PackageTags>api-wrapper, steam-api, steam-web-api, steam-webapi, steamapi, steamwebapi, valve, steam</PackageTags>
     <RepositoryUrl>https://github.com/Vasar007/SteamWebApiLib.git</RepositoryUrl>
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
-    <FileVersion>1.0.3.0</FileVersion>
-    <Version>1.0.3</Version>
+    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <FileVersion>1.0.4.0</FileVersion>
+    <Version>1.0.4</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/Vasar007/SteamWebApiLib</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\Users\vasar\Documents\GitHub\SteamWebApiLib\SteamWebApiLib\SteamWebApiLib.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
