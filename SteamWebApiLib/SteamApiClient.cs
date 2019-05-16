@@ -213,7 +213,9 @@ namespace SteamWebApiLib
             queryParameters.AppendParameter("appids", appId.ToString());
             if (countryCode != CountryCode.Unknown)
             {
-                queryParameters.AppendParameter("cc", countryCode.ToString());
+                queryParameters.AppendParameter(
+                    "cc", CountryCodeConverter.GetCountryCodeStringValue(countryCode)
+                );
             }
             if (language != Language.Unknown)
             {
@@ -285,7 +287,9 @@ namespace SteamWebApiLib
             var queryParameters = new QueryParametersBuilder();
             if (countryCode != CountryCode.Unknown)
             {
-                queryParameters.AppendParameter("cc", countryCode.ToString());
+                queryParameters.AppendParameter(
+                    "cc", CountryCodeConverter.GetCountryCodeStringValue(countryCode)
+                );
             }
             if (language != Language.Unknown)
             {
@@ -357,7 +361,9 @@ namespace SteamWebApiLib
             var queryParameters = new QueryParametersBuilder();
             if (countryCode != CountryCode.Unknown)
             {
-                queryParameters.AppendParameter("cc", countryCode.ToString());
+                queryParameters.AppendParameter(
+                    "cc", CountryCodeConverter.GetCountryCodeStringValue(countryCode)
+                );
             }
             if (language != Language.Unknown)
             {
@@ -434,7 +440,9 @@ namespace SteamWebApiLib
             queryParameters.AppendParameter("packageids", packageId.ToString());
             if (countryCode != CountryCode.Unknown)
             {
-                queryParameters.AppendParameter("cc", countryCode.ToString());
+                queryParameters.AppendParameter(
+                    "cc", CountryCodeConverter.GetCountryCodeStringValue(countryCode)
+                );
             }
             if (language != Language.Unknown)
             {
