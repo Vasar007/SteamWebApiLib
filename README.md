@@ -11,6 +11,11 @@ The Steam API is not officially available or documented, all data in this librar
 
 ```cs
 using SteamWebApiLib;
+using SteamWebApiLib.Models.AppDetails;
+using SteamWebApiLib.Models.BriefInfo;
+using SteamWebApiLib.Models.Featured;
+using SteamWebApiLib.Models.FeaturedCategories;
+using SteamWebApiLib.Models.PackageDetails;
 
 public static async Task Examples()
 {
