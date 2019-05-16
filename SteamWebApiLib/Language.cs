@@ -1,14 +1,12 @@
-﻿namespace SteamWebApiLib.Models.Reviews
+﻿namespace SteamWebApiLib
 {
     public enum Language
     {
         Unknown,
 
+        Brazilian,
+
         Bulgarian,
-
-        Schinese,
-
-        Tchinese,
 
         Czech,
 
@@ -40,15 +38,23 @@
 
         Portuguese,
 
-        Brazilian,
-
         Romanian,
 
         Russian,
 
+        /// <summary>
+        /// Simplified chinese language.
+        /// </summary>
+        Schinese,
+
         Spanish,
 
         Swedish,
+
+        /// <summary>
+        /// Tranditional chinese language.
+        /// </summary>
+        Tchinese,
 
         Thai,
 
