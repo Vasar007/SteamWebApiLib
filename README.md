@@ -1,7 +1,7 @@
 # SteamWebApiLib
 
 [![nuget](https://img.shields.io/nuget/v/SteamWebApiLib.svg)](https://www.nuget.org/packages/SteamWebApiLib)
-[![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/Vasar007/TIMLE/blob/master/LICENSE)
+[![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/Vasar007/SteamWebApiLib/blob/master/LICENSE)
 
 SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods to retrieve various data from the Steam API. Lib can interact with Steam Strorefront API and Steam Web API (each API provides different set of data).
 
