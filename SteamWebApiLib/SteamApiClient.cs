@@ -6,6 +6,7 @@ using System.Net;
 using Newtonsoft.Json.Linq;
 using Polly;
 using Polly.Retry;
+using SteamWebApiLib.Exceptions;
 using SteamWebApiLib.Models.Requests;
 using SteamWebApiLib.Models.AppDetails;
 using SteamWebApiLib.Models.Featured;
@@ -18,9 +19,10 @@ using SteamWebApiLib.Models.Reviews;
 namespace SteamWebApiLib
 {
     /// <summary>
-    /// Client which can make a requests to the Steam API. Client uses Retry Policy and will try to 
-    /// get response several times (you can specify attempts number in config). If no response was 
-    /// received or an error code was received, an exception will be thrown.
+    /// <para>Client which can make a requests to the Steam API.</para>
+    /// Client uses Retry Policy and will try to get response several times (you can specify 
+    /// attempts number in config). If no response was received or an error code was received, an 
+    /// exception will be thrown.
     /// </summary>
     public sealed class SteamApiClient : IDisposable
     {
@@ -82,22 +84,30 @@ namespace SteamWebApiLib
         public async Task<ReviewsResponse> GetReviewsAsync(GetReviewsRequest request,
             CancellationToken token = default)
         {
-            // https://partner.steamgames.com/doc/store/getreviews
-            string queryParameters = $"{request.AppId}?json=1" +
-                $"&filter={request.Filter.ToString().ToLower()}" +
-                $"&language={request.Language}" +
-                $"&review_type={request.ReviewType.ToString().ToLower()}" +
-                $"&purchase_type={request.PurchaseType.ToString().ToLower()}" +
-                (request.DayRange.HasValue
-                    ? $"&day_range={request.DayRange.Value}"
-                    : string.Empty) +
-                (request.StartOffset.HasValue
-                    ? $"&start_offset={request.StartOffset.Value}"
-                    : string.Empty);
+            // Another option: https://partner.steamgames.com/doc/store/getreviews
+
+            var queryParameters = new QueryParametersBuilder();
+            queryParameters.AppendParameter("json", "1");
+            queryParameters.AppendParameter("filter", request.Filter.ToString().ToLower());
+            queryParameters.AppendParameter("language", request.Language);
+            queryParameters.AppendParameter("review_type", request.ReviewType.ToString().ToLower());
+            queryParameters.AppendParameter(
+                "purchase_type", request.PurchaseType.ToString().ToLower()
+            );
+            if (request.DayRange.HasValue)
+            {
+                queryParameters.AppendParameter("day_range", request.DayRange.Value.ToString());
+            }
+            if (request.StartOffset.HasValue)
+            {
+                queryParameters.AppendParameter(
+                    "start_offset", request.StartOffset.Value.ToString()
+                );
+            }
 
             using (var response = await GetRetryPolicy().ExecuteAsync(
-                       () => _httpClient.GetAsync(_config.SteamStoreBaseUrl + "/appreviews/" +
-                           queryParameters, token)))
+                       () => _httpClient.GetAsync(_config.SteamStoreBaseUrl +
+                           $"/appreviews/{request.AppId}" + queryParameters.ToString(), token)))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -106,7 +116,9 @@ namespace SteamWebApiLib
                 var jsonData = JToken.Parse(result);
                 if (jsonData["success"].ToString() != "1")
                 {
-                    throw new Exception("Bad request status.");
+                    throw new SteamApiBadRequestException(
+                        "Bad request status. Check if you specified rigth parameters."
+                    );
                 }
 
 
@@ -123,20 +135,24 @@ namespace SteamWebApiLib
         public async Task<SteamAppNews> GetAppNewsAsync(GetNewsRequest request,
             CancellationToken token = default)
         {
-            string queryParameters = GetBaseQuery() + "&appid=" + request.AppId;
+            var queryParameters = new QueryParametersBuilder();
+            queryParameters.AppendParameter("format", "json");
+            queryParameters.AppendParameter("key", _config.ApiKey);
+            queryParameters.AppendParameter("appid", request.AppId.ToString());
             if (request.EndDate.HasValue)
             {
-                queryParameters += "&enddate=" + request.EndDate.Value.ToUnixTimeSeconds();
+                queryParameters.AppendParameter(
+                    "enddate", request.EndDate.Value.ToUnixTimeSeconds().ToString()
+                );
             }
-
             if (request.Count.HasValue)
             {
-                queryParameters += "&count=" + request.Count.Value;
+                queryParameters.AppendParameter("count", request.Count.Value.ToString());
             }
 
             using (var response = await GetRetryPolicy().ExecuteAsync(
                        () => _httpClient.GetAsync(_config.SteamPoweredBaseUrl +
-                           "/ISteamNews/GetNewsForApp/v0002/" + queryParameters, token)))
+                           "/ISteamNews/GetNewsForApp/v0002/" + queryParameters.ToString(), token)))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -153,6 +169,34 @@ namespace SteamWebApiLib
         /// Retrieves details for the specified application.
         /// </summary>  
         /// <param name="appId">Steam App ID.</param>
+        /// <param name="token">Propogates notification that operation should be cancelled.</param>
+        /// <returns>Details for an application in the steam store.</returns>
+        public async Task<SteamApp> GetSteamAppAsync(int appId, CancellationToken token = default)
+        {
+            return await GetSteamAppAsync(appId, CountryCode.Unknown, Language.Unknown, token);
+        }
+
+        /// <summary>
+        /// Retrieves details for the specified application. Some of the data in response may vary 
+        /// for a given country code.
+        /// </summary>  
+        /// <param name="appId">Steam App ID.</param>
+        /// <param name="countryCode">
+        /// Two letter country code to customise currency and date values.
+        /// </param>
+        /// <param name="token">Propogates notification that operation should be cancelled.</param>
+        /// <returns>Details for an application in the steam store.</returns>
+        public async Task<SteamApp> GetSteamAppAsync(int appId, CountryCode countryCode,
+            CancellationToken token = default)
+        {
+            return await GetSteamAppAsync(appId, countryCode, Language.Unknown, token);
+        }
+
+        /// <summary>
+        /// Retrieves details for the specified application. Some of the data in response may vary 
+        /// for a given country code and language.
+        /// </summary>  
+        /// <param name="appId">Steam App ID.</param>
         /// <param name="countryCode">
         /// Two letter country code to customise currency and date values.
         /// </param>
@@ -162,21 +206,25 @@ namespace SteamWebApiLib
         /// </param>
         /// <param name="token">Propogates notification that operation should be cancelled.</param>
         /// <returns>Details for an application in the steam store.</returns>
-        public async Task<SteamApp> GetSteamAppAsync(int appId, string countryCode = null,
-            string language = null, CancellationToken token = default)
+        public async Task<SteamApp> GetSteamAppAsync(int appId, CountryCode countryCode,
+            Language language, CancellationToken token = default)
         {
-            string queryParameters = $"?appids={appId}";
-            queryParameters = string.IsNullOrWhiteSpace(countryCode)
-                ? queryParameters
-                : $"{queryParameters}&cc={countryCode}";
-
-            queryParameters = string.IsNullOrWhiteSpace(language)
-                ? queryParameters
-                : $"{queryParameters}&l={language.ToLower()}";
+            var queryParameters = new QueryParametersBuilder();
+            queryParameters.AppendParameter("appids", appId.ToString());
+            if (countryCode != CountryCode.Unknown)
+            {
+                queryParameters.AppendParameter(
+                    "cc", CountryCodeConverter.GetCountryCodeStringValue(countryCode)
+                );
+            }
+            if (language != Language.Unknown)
+            {
+                queryParameters.AppendParameter("l", language.ToString().ToLower());
+            }
 
             using (var response = await GetRetryPolicy().ExecuteAsync(
                       () => _httpClient.GetAsync(_config.SteamStoreBaseUrl + "/api/appdetails" +
-                          queryParameters, token)))
+                          queryParameters.ToString(), token)))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -186,7 +234,9 @@ namespace SteamWebApiLib
                 var jsonData = JToken.Parse(result).First.First;
                 if (!bool.Parse(jsonData["success"].ToString()))
                 {
-                    throw new Exception("Bad request status.");
+                    throw new SteamApiBadRequestException(
+                        "Bad request status. Check if you specified right AppID."
+                    );
                 }
 
                 return jsonData["data"].ToObject<SteamApp>();
@@ -195,6 +245,32 @@ namespace SteamWebApiLib
 
         /// <summary>
         /// Retrieves a list of featured items.
+        /// </summary>  
+        /// <param name="token">Propogates notification that operation should be cancelled.</param>
+        /// <returns>A list of featured items in the steam store.</returns>
+        public async Task<FeaturedApps> GetFeaturedAppsAsync(CancellationToken token = default)
+        {
+            return await GetFeaturedAppsAsync(CountryCode.Unknown, Language.Unknown, token);
+        }
+
+        /// <summary>
+        /// Retrieves a list of featured items. Some of the data in response may vary for a given 
+        /// country code.
+        /// </summary>  
+        /// <param name="countryCode">
+        /// Two letter country code to customise currency and date values.
+        /// </param>
+        /// <param name="token">Propogates notification that operation should be cancelled.</param>
+        /// <returns>A list of featured items in the steam store.</returns>
+        public async Task<FeaturedApps> GetFeaturedAppsAsync(CountryCode countryCode,
+            CancellationToken token = default)
+        {
+            return await GetFeaturedAppsAsync(countryCode, Language.Unknown, token);
+        }
+
+        /// <summary>
+        /// Retrieves a list of featured items. Some of the data in response may vary for a given 
+        /// country code and language.
         /// </summary>  
         /// <param name="countryCode">
         /// Two letter country code to customise currency and date values.
@@ -205,22 +281,24 @@ namespace SteamWebApiLib
         /// </param>
         /// <param name="token">Propogates notification that operation should be cancelled.</param>
         /// <returns>A list of featured items in the steam store.</returns>
-        public async Task<FeaturedApps> GetFeaturedAppsAsync(string countryCode = null,
-            string language = null, CancellationToken token = default)
+        public async Task<FeaturedApps> GetFeaturedAppsAsync(CountryCode countryCode,
+            Language language, CancellationToken token = default)
         {
-            string queryParameters = string.IsNullOrWhiteSpace(countryCode)
-                ? string.Empty
-                : $"?cc={countryCode}";
-
-            if (!string.IsNullOrWhiteSpace(language))
+            var queryParameters = new QueryParametersBuilder();
+            if (countryCode != CountryCode.Unknown)
             {
-                queryParameters += string.IsNullOrWhiteSpace(countryCode) ? "?" : "&";
-                queryParameters += $"l={language.ToLower()}";
+                queryParameters.AppendParameter(
+                    "cc", CountryCodeConverter.GetCountryCodeStringValue(countryCode)
+                );
+            }
+            if (language != Language.Unknown)
+            {
+                queryParameters.AppendParameter("l", language.ToString().ToLower());
             }
 
             using (var response = await GetRetryPolicy().ExecuteAsync(
                       () => _httpClient.GetAsync(_config.SteamStoreBaseUrl + "/api/featured" +
-                          queryParameters, token)))
+                          queryParameters.ToString(), token)))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -229,7 +307,9 @@ namespace SteamWebApiLib
                 var jsonData = JToken.Parse(result);
                 if (jsonData["status"].ToString() != "1")
                 {
-                    throw new Exception("Bad request status.");
+                    throw new SteamApiBadRequestException(
+                        "Bad request status. Check if you specified right parameters."
+                    );
                 }
 
                 return FeaturedApps.FromJson(result);
@@ -239,7 +319,35 @@ namespace SteamWebApiLib
         /// <summary>
         /// Retrieves a list of featured items, grouped by category.
         /// </summary>  
-        /// <param name="countryCode">Two letter country code to customise currency and date values.
+        /// <param name="token">Propogates notification that operation should be cancelled.</param>
+        /// <returns>A list of featured items, grouped by category, in the steam store.</returns>
+        public async Task<FeaturedCategories> GetFeaturedCategoriesAsync(
+            CancellationToken token = default)
+        {
+            return await GetFeaturedCategoriesAsync(CountryCode.Unknown, Language.Unknown, token);
+        }
+
+        /// <summary>
+        /// Retrieves a list of featured items, grouped by category. Some of the data in response 
+        /// may vary for a given country code.
+        /// </summary>  
+        /// <param name="countryCode">
+        /// Two letter country code to customise currency and date values.
+        /// </param>
+        /// <param name="token">Propogates notification that operation should be cancelled.</param>
+        /// <returns>A list of featured items, grouped by category, in the steam store.</returns>
+        public async Task<FeaturedCategories> GetFeaturedCategoriesAsync(CountryCode countryCode,
+            CancellationToken token = default)
+        {
+            return await GetFeaturedCategoriesAsync(countryCode, Language.Unknown, token);
+        }
+
+        /// <summary>
+        /// Retrieves a list of featured items, grouped by category. Some of the data in response 
+        /// may vary for a given country code and language.
+        /// </summary>  
+        /// <param name="countryCode">
+        /// Two letter country code to customise currency and date values.
         /// </param>
         /// <param name="language">
         /// Full name of the language in english used for string localization e.g. name, 
@@ -247,22 +355,24 @@ namespace SteamWebApiLib
         /// </param>
         /// <param name="token">Propogates notification that operation should be cancelled.</param>
         /// <returns>A list of featured items, grouped by category, in the steam store.</returns>
-        public async Task<FeaturedCategories> GetFeaturedCategoriesAsync(
-            string countryCode = null, string language = null, CancellationToken token = default)
+        public async Task<FeaturedCategories> GetFeaturedCategoriesAsync(CountryCode countryCode,
+            Language language, CancellationToken token = default)
         {
-            string queryParameters = string.IsNullOrWhiteSpace(countryCode)
-                ? string.Empty
-                : $"?cc={countryCode}";
-
-            if (!string.IsNullOrWhiteSpace(language))
+            var queryParameters = new QueryParametersBuilder();
+            if (countryCode != CountryCode.Unknown)
             {
-                queryParameters += string.IsNullOrWhiteSpace(countryCode) ? "?" : "&";
-                queryParameters += $"l={language.ToLower()}";
+                queryParameters.AppendParameter(
+                    "cc", CountryCodeConverter.GetCountryCodeStringValue(countryCode)
+                );
+            }
+            if (language != Language.Unknown)
+            {
+                queryParameters.AppendParameter("l", language.ToString().ToLower());
             }
 
             using (var response = await GetRetryPolicy().ExecuteAsync(
                       () => _httpClient.GetAsync(_config.SteamStoreBaseUrl 
-                          + "/api/featuredcategories" + queryParameters, token)))
+                          + "/api/featuredcategories" + queryParameters.ToString(), token)))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -271,7 +381,9 @@ namespace SteamWebApiLib
                 var jsonData = JObject.Parse(result);
                 if (jsonData["status"].ToString() != "1")
                 {
-                    throw new Exception("Bad request status.");
+                    throw new SteamApiBadRequestException(
+                        "Bad request status. Check if you specified right parameters."
+                    );
                 }
 
                 return jsonData.ToObject<FeaturedCategories>();
@@ -280,6 +392,36 @@ namespace SteamWebApiLib
 
         /// <summary>
         /// Retrieves details for the specified package.
+        /// </summary>  
+        /// <param name="packageId">Steam package ID.</param>
+        /// <param name="token">Propogates notification that operation should be cancelled.</param>
+        /// <returns>Details for a package in the steam store.</returns>
+        public async Task<PackageInfo> GetPackageInfoAsync(int packageId,
+            CancellationToken token = default)
+        {
+            return await GetPackageInfoAsync(packageId, CountryCode.Unknown, Language.Unknown,
+                                             token);
+        }
+
+        /// <summary>
+        /// Retrieves details for the specified package. Some of the data in response may vary for 
+        /// a given country code.
+        /// </summary>  
+        /// <param name="packageId">Steam package ID.</param>
+        /// <param name="countryCode">
+        /// Two letter country code to customise currency and date values.
+        /// </param>
+        /// <param name="token">Propogates notification that operation should be cancelled.</param>
+        /// <returns>Details for a package in the steam store.</returns>
+        public async Task<PackageInfo> GetPackageInfoAsync(int packageId, CountryCode countryCode,
+            CancellationToken token = default)
+        {
+            return await GetPackageInfoAsync(packageId, countryCode, Language.Unknown, token);
+        }
+
+        /// <summary>
+        /// Retrieves details for the specified package. Some of the data in response may vary for 
+        /// a given country code and language.
         /// </summary>  
         /// <param name="packageId">Steam package ID.</param>
         /// <param name="countryCode">
@@ -291,22 +433,25 @@ namespace SteamWebApiLib
         /// </param>
         /// <param name="token">Propogates notification that operation should be cancelled.</param>
         /// <returns>Details for a package in the steam store.</returns>
-        public async Task<PackageInfo> GetPackageInfoAsync(int packageId, string countryCode = null,
-            string language = null, CancellationToken token = default)
+        public async Task<PackageInfo> GetPackageInfoAsync(int packageId, CountryCode countryCode,
+            Language language, CancellationToken token = default)
         {
-
-            string queryParameters = $"?packageids={packageId}";
-            queryParameters = string.IsNullOrWhiteSpace(countryCode)
-                ? queryParameters
-                : $"{queryParameters}&cc={countryCode}";
-
-            queryParameters = string.IsNullOrWhiteSpace(language)
-                ? queryParameters
-                : $"{queryParameters}&l={language.ToLower()}";
+            var queryParameters = new QueryParametersBuilder();
+            queryParameters.AppendParameter("packageids", packageId.ToString());
+            if (countryCode != CountryCode.Unknown)
+            {
+                queryParameters.AppendParameter(
+                    "cc", CountryCodeConverter.GetCountryCodeStringValue(countryCode)
+                );
+            }
+            if (language != Language.Unknown)
+            {
+                queryParameters.AppendParameter("l", language.ToString().ToLower());
+            }
 
             using (var response = await GetRetryPolicy().ExecuteAsync(
                       () => _httpClient.GetAsync(_config.SteamStoreBaseUrl + "/api/packagedetails" +
-                          queryParameters, token)))
+                          queryParameters.ToString(), token)))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -316,7 +461,9 @@ namespace SteamWebApiLib
                 var jsonData = JToken.Parse(result).First.First;
                 if (!bool.Parse(jsonData["success"].ToString()))
                 {
-                    throw new Exception("Bad request status.");
+                    throw new SteamApiBadRequestException(
+                        "Bad request status. Check if you specified right PackageID."
+                    );
                 }
 
                 var package = jsonData["data"].ToObject<PackageInfo>();
@@ -355,18 +502,6 @@ namespace SteamWebApiLib
                 _config.RetryAttempts, retryAttempt => TimeSpan.FromSeconds(
                     Math.Pow(_config.RetryBackoffExponent, retryAttempt)
                 )
-            );
-        }
-
-        /// <summary>
-        /// Creates base query with API key.
-        /// </summary>
-        /// <returns>Query string for request with optional key.</returns>
-        private string GetBaseQuery()
-        {
-            return "?format=json" + (string.IsNullOrWhiteSpace(_config.ApiKey)
-                ? string.Empty
-                : "&key=" + _config.ApiKey
             );
         }
     }

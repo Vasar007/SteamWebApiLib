@@ -9,6 +9,10 @@ namespace SteamWebApiLibTests
 {
     public class SteamApiClientTests
     {
+        private const CountryCode _defaulCountryCode = CountryCode.USA;
+
+        private const Language _defaulLanguage = Language.English;
+
         private readonly SteamApiClient _steamApiClient;
 
 
@@ -51,17 +55,19 @@ namespace SteamWebApiLibTests
             });
         }
 
-        [Fact]
-        public async Task TestGetAppNews()
+        // 440 = Team Fortress 2 AppId
+        // 292030 = The Witcher 3: Wild Hunt AppId
+        // 976310 = Mortal Kombat 11 AppId
+        [Theory]
+        [InlineData(440)]
+        [InlineData(292030)]
+        [InlineData(976310)]
+        public async Task TestGetAppNews(int appId)
         {
-            int mortalKombat11AppId = 976310;
-
-            var appNews = await _steamApiClient.GetAppNewsAsync(
-                new GetNewsRequest(mortalKombat11AppId)
-            );
+            var appNews = await _steamApiClient.GetAppNewsAsync(new GetNewsRequest(appId));
 
             Assert.NotNull(appNews);
-            Assert.Equal(mortalKombat11AppId, appNews.AppId);
+            Assert.Equal(appId, appNews.AppId);
             Assert.NotNull(appNews.NewsItems);
 
             Assert.NotEmpty(appNews.NewsItems);
@@ -78,10 +84,14 @@ namespace SteamWebApiLibTests
             });
         }
 
-        [Fact]
-        public async Task TestGetFeaturedApps()
+        [Theory]
+        [InlineData(_defaulCountryCode, _defaulLanguage)]
+        [InlineData(CountryCode.Germany, Language.German)]
+        public async Task TestGetFeaturedApps(CountryCode countryCode, Language language)
         {
-            var featuredApps = await _steamApiClient.GetFeaturedAppsAsync();
+            var featuredApps = await _steamApiClient.GetFeaturedAppsAsync(
+                countryCode, language
+            );
 
             Assert.NotNull(featuredApps);
             Assert.NotNull(featuredApps.FeaturedLinux);
@@ -90,7 +100,7 @@ namespace SteamWebApiLibTests
             Assert.NotNull(featuredApps.LargeCapsules);
             Assert.NotNull(featuredApps.Layout);
 
-            int featuredAppsCount = 10;
+            const int featuredAppsCount = 10;
             Assert.Equal(featuredAppsCount, featuredApps.FeaturedLinux.Length);
             Assert.Equal(featuredAppsCount, featuredApps.FeaturedMac.Length);
             Assert.Equal(featuredAppsCount, featuredApps.FeaturedWin.Length);
@@ -119,13 +129,15 @@ namespace SteamWebApiLibTests
             CheckFeatureadAppsCollections(featuredCategories.TopSellers.Items);
         }
 
-        [Fact]
-        public async Task TestGetPackageInfo()
+        // 68179 = Don't Starve Together PackageId
+        [Theory]
+        [InlineData(68179, _defaulCountryCode, _defaulLanguage)]
+        [InlineData(68179, CountryCode.Germany, Language.German)]
+        public async Task TestGetPackageInfo(int packageId, CountryCode countryCode,
+            Language language)
         {
-            int dontStarveTogetherPackageId = 68179;
-
             var packageInfo = await _steamApiClient.GetPackageInfoAsync(
-                dontStarveTogetherPackageId, "US"
+                packageId, countryCode, language
             );
 
             Assert.NotNull(packageInfo);
@@ -138,7 +150,7 @@ namespace SteamWebApiLibTests
             Assert.NotNull(packageInfo.PurchaseText);
             Assert.NotNull(packageInfo.ReleaseDate);
             Assert.NotNull(packageInfo.SmallLogo);
-            Assert.Equal(dontStarveTogetherPackageId, packageInfo.SteamPackageId);
+            Assert.Equal(packageId, packageInfo.SteamPackageId);
 
             Assert.NotEmpty(packageInfo.Apps);
             Assert.All(packageInfo.Apps, app =>
@@ -149,13 +161,17 @@ namespace SteamWebApiLibTests
             });
         }
 
-        [Fact]
-        public async Task TestGetReviewsInfo()
+        // 440 = Team Fortress 2 AppId
+        // 292030 = The Witcher 3: Wild Hunt AppId
+        // 976310 = Mortal Kombat 11 AppId
+        [Theory]
+        [InlineData(440)]
+        [InlineData(292030)]
+        [InlineData(976310)]
+        public async Task TestGetReviewsInfo(int appId)
         {
-            int teamFortress2AppId = 440;
-
             var reviewsResponse = await _steamApiClient.GetReviewsAsync(
-                new GetReviewsRequest(teamFortress2AppId)
+                new GetReviewsRequest(appId)
             );
 
             Assert.NotNull(reviewsResponse);
@@ -174,12 +190,21 @@ namespace SteamWebApiLibTests
             });
         }
 
-        [Fact]
-        public async Task TestGetSteamApp()
+        // 440 = Team Fortress 2 AppId
+        // 292030 = The Witcher 3: Wild Hunt AppId
+        // 976310 = Mortal Kombat 11 AppId
+        [Theory]
+        [InlineData(440, _defaulCountryCode, _defaulLanguage)]
+        [InlineData(440, CountryCode.Germany, Language.German)]
+        [InlineData(292030, _defaulCountryCode, _defaulLanguage)]
+        [InlineData(292030, CountryCode.Germany, Language.German)]
+        [InlineData(976310, _defaulCountryCode, _defaulLanguage)]
+        [InlineData(976310, CountryCode.Germany, Language.German)]
+        public async Task TestGetSteamApp(int appId, CountryCode countryCode, Language language)
         {
-            int teamFortress2AppId = 440;
-
-            var steamApp = await _steamApiClient.GetSteamAppAsync(teamFortress2AppId);
+            var steamApp = await _steamApiClient.GetSteamAppAsync(
+                appId, countryCode, language
+            );
 
             Assert.NotNull(steamApp);
             Assert.NotNull(steamApp.AboutTheGame);
@@ -194,15 +219,11 @@ namespace SteamWebApiLibTests
             Assert.NotNull(steamApp.Genres);
             Assert.NotEmpty(steamApp.Genres);
             Assert.NotNull(steamApp.HeaderImage);
-            Assert.NotNull(steamApp.LinuxRequirements);
-            Assert.NotNull(steamApp.MacRequirements);
             Assert.NotNull(steamApp.Movies);
             Assert.NotEmpty(steamApp.Movies);
             Assert.NotNull(steamApp.Name);
             Assert.NotNull(steamApp.PackageGroups);
-            Assert.NotEmpty(steamApp.PackageGroups);
             Assert.NotNull(steamApp.Packages);
-            Assert.NotEmpty(steamApp.Packages);
             Assert.NotNull(steamApp.PcRequirements);
             Assert.NotNull(steamApp.Platforms);
             Assert.NotNull(steamApp.Publishers);
@@ -213,7 +234,7 @@ namespace SteamWebApiLibTests
             Assert.NotNull(steamApp.Screenshots);
             Assert.NotEmpty(steamApp.Screenshots);
             Assert.NotNull(steamApp.ShortDescription);
-            Assert.Equal(teamFortress2AppId, steamApp.SteamAppId);
+            Assert.Equal(appId, steamApp.SteamAppId);
             Assert.NotNull(steamApp.SupportedLanguages);
             Assert.NotNull(steamApp.SupportInfo);
             Assert.NotNull(steamApp.Type);
