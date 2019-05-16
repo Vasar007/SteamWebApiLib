@@ -46,7 +46,7 @@ public static async Task Examples()
     FeaturedCategories featuredCategories = await steamApiClient.GetFeaturedCategoriesAsync();
 
     // Get a list of featured games grouped by category for region US
-    FeaturedCategories featuredCategories2 = await FeaturedCategories.GetFeaturedCategoriesAsync("DE");
+    FeaturedCategories featuredCategories2 = await steamApiClient.GetFeaturedCategoriesAsync("DE");
 }
 ```
 
