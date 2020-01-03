@@ -4,9 +4,9 @@
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/Vasar007/SteamWebApiLib/blob/master/LICENSE)
 [![AppVeyor branch](https://img.shields.io/appveyor/ci/Vasar007/SteamWebApiLib/master.svg)](https://ci.appveyor.com/project/Vasar007/steamwebapiLib)
 
-SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods to retrieve various data from the Steam API. Lib can interact with Steam Strorefront API and Steam Web API (each API provides different set of data).
+SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods to retrieve various data from the Steam API. Library can interact with Steam Strorefront API and Steam Web API (each API provides a different set of data).
 
-The Steam API is not officially available or documented, all data in this library was either compiled by trial and error from the inofficial API documentation, and is therefore provided as-is.
+The Steam API is not officially available or documented. So, all data in this library was either collected by trial and error from unofficial API documentation, and is therefore provided as-is.
 
 ## Usage examples
 
