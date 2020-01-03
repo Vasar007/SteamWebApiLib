@@ -10,7 +10,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <repositoryUrl>$repositoryUrl$</repositoryUrl>
     <repositoryType>$repositoryType$</repositoryType>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>$tags$</tags>
