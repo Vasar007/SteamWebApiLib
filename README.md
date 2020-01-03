@@ -1,7 +1,8 @@
 # SteamWebApiLib
 
 [![nuget](https://img.shields.io/nuget/v/SteamWebApiLib.svg)](https://www.nuget.org/packages/SteamWebApiLib)
-[![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/Vasar007/TIMLE/blob/master/LICENSE)
+[![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/Vasar007/SteamWebApiLib/blob/master/LICENSE)
+[![AppVeyor branch](https://img.shields.io/appveyor/ci/Vasar007/SteamWebApiLib/master.svg)](https://ci.appveyor.com/project/Vasar007/steamwebapiLib)
 
 SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods to retrieve various data from the Steam API. Lib can interact with Steam Strorefront API and Steam Web API (each API provides different set of data).
 
@@ -77,3 +78,11 @@ As a basis for project were taken [SteamStorefrontAPI](https://github.com/mmuffi
 ## License information
 
 This project is licensed under the terms of the [Apache License 2.0](LICENSE).
+
+### Third party software and libraries used
+
+Newtonsoft.Json https://www.newtonsoft.com/json
+
+Copyright (c) 2007 James Newton-King
+
+License (MIT) https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md
