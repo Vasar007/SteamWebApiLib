@@ -1,29 +1,40 @@
 version: '{build}'
 image: Visual Studio 2017
 
-pull_requests:
-    do_not_increment_build_number: true
-
 branches:  
-    only:
+  only:
     - master
     - develop
 
-nuget:  
-    disable_publish_on_pr: true
+configuration:
+  - Debug
+  - Release
+
+matrix:
+  fast_finish: true
 
 before_build:
-- cmd: dotnet restore
+  - cmd: dotnet restore
+
+build:
+  verbosity: minimal
 
 after_build:
-- dotnet test
-- dotnet pack "SteamWebApiLib" -c Release
+  - dotnet test
+  - dotnet pack "SteamWebApiLib" -c Release
 
 artifacts:
-- path: SteamWebApiLib\bin\Release\*.nupkg
+  - path: SteamWebApiLib\bin\Release\*.nupkg
 
 deploy:  
-- provider: Environment
-  name: nuget.org
-  on:
+  - provider: Environment
+    name: SteamWebApiLib
+    on:
       branch: master
+      configuration: Release
+
+pull_requests:
+    do_not_increment_build_number: true
+
+nuget:
+    disable_publish_on_pr: true

@@ -8,6 +8,10 @@ SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods
 
 The Steam API is not officially available or documented. So, all data in this library was either collected by trial and error from unofficial API documentation, and is therefore provided as-is.
 
+## Installation
+
+Install [NuGet package](https://www.nuget.org/packages/SteamWebApiLib).
+
 ## Usage examples
 
 ```cs
@@ -26,7 +30,7 @@ private static async Task Examples()
 
     // Get full list of SteamApps.
     SteamAppBriefInfoList steamAppList = await steamApiClient.GetAppListAsync();
-    Console.WriteLine($"Got {steamAppList.Apps.Length} items.");
+    Console.WriteLine($"Got {steamAppList.Apps.Length.ToString()} items.");
 
     // Get details for SteamApp with ID 292030 (The Witcher 3: Wild Hunt).
     SteamApp steamApp1 = await steamApiClient.GetSteamAppAsync(292030);
@@ -42,23 +46,23 @@ private static async Task Examples()
 
     // Get details for Package with same ID for region JP.
     PackageInfo package2 = await steamApiClient.GetPackageInfoAsync(68179, CountryCode.Japan);
-    Console.WriteLine($"Got response for {package1.Name}.");
+    Console.WriteLine($"Got response for {package2.Name}.");
 
     // Get a list of featured games.
     FeaturedApps featured1 = await steamApiClient.GetFeaturedAppsAsync();
-    Console.WriteLine($"Got {featured1.FeaturedWin.Length} items for Winodws.");
+    Console.WriteLine($"Got {featured1.FeaturedWin.Length.ToString()} items for Windows.");
 
     // Get a list of featured games for region DE.
     FeaturedApps featured2 = await steamApiClient.GetFeaturedAppsAsync(CountryCode.Germany);
-    Console.WriteLine($"Got {featured2.FeaturedWin.Length} items for Winodws.");
+    Console.WriteLine($"Got {featured2.FeaturedWin.Length.ToString()} items for Windows.");
 
     // Get a list of featured games grouped by category.
     FeaturedCategories featuredCategories1 = await steamApiClient.GetFeaturedCategoriesAsync();
-    Console.WriteLine($"Got {featuredCategories1.TopSellers.Items.Length} top sellers items.");
+    Console.WriteLine($"Got {featuredCategories1.TopSellers.Items.Length.ToString()} top sellers items.");
 
     // Get a list of featured games grouped by category for region US.
     FeaturedCategories featuredCategories2 = await steamApiClient.GetFeaturedCategoriesAsync(CountryCode.USA);
-    Console.WriteLine($"Got {featuredCategories2.TopSellers.Items.Length} top sellers items.");
+    Console.WriteLine($"Got {featuredCategories2.TopSellers.Items.Length.ToString()} top sellers items.");
 }
 ```
 
@@ -81,8 +85,8 @@ This project is licensed under the terms of the [Apache License 2.0](LICENSE).
 
 ### Third party software and libraries used
 
-Newtonsoft.Json https://www.newtonsoft.com/json
+#### [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 
-Copyright (c) 2007 James Newton-King
+Copyright © 2007 James Newton-King
 
-License (MIT) https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md
+License: [MIT](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md)
