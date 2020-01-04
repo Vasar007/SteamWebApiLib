@@ -85,8 +85,8 @@ This project is licensed under the terms of the [Apache License 2.0](LICENSE).
 
 ### Third party software and libraries used
 
-Newtonsoft.Json https://www.newtonsoft.com/json
+#### [Newtonsoft.Json](https://www.newtonsoft.com/json)
 
-Copyright (c) 2007 James Newton-King
+Copyright © 2007 James Newton-King
 
-License (MIT) https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md
+[License MIT](https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md)
