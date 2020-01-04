@@ -19,6 +19,9 @@ The Steam API is not officially available or documented. So, all data in this li
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/Vasar007/SteamWebApiLib</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Copyright>Copyright © 2019 Vasily Vasilyev (vasar007@yandex.ru)</Copyright>
+    <ApplicationIcon></ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

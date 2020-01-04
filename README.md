@@ -8,6 +8,10 @@ SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods
 
 The Steam API is not officially available or documented, all data in this library was either compiled by trial and error from the inofficial API documentation, and is therefore provided as-is.
 
+## Installation
+
+Install [NuGet package](https://www.nuget.org/packages/SteamWebApiLib).
+
 ## Usage examples
 
 ```cs
