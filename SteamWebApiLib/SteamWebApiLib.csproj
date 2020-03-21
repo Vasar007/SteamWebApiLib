@@ -10,7 +10,7 @@
     <Product>SteamWebApiLib</Product>
     <Description>SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods to retrieve various data from the Steam API. Library can interact with Steam Strorefront API and Steam Web API (each API provides a different set of data).
 
-The Steam API is not officially available or documented. So, all data in this library was either collected by trial and error from unofficial API documentation, and is therefore provided as-is.</Description>
+The Steam API is not officially available or documented. So, all data in this library was either compiled by trial or error from unofficial API documentation, and is therefore provided as-is.</Description>
     <PackageTags>api-wrapper, steam-api, steam-web-api, steam-webapi, steamapi, steamwebapi, valve, steam</PackageTags>
     <RepositoryUrl>https://github.com/Vasar007/SteamWebApiLib.git</RepositoryUrl>
     <AssemblyVersion>1.1.0.1</AssemblyVersion>
@@ -20,7 +20,7 @@ The Steam API is not officially available or documented. So, all data in this li
     <PackageProjectUrl>https://github.com/Vasar007/SteamWebApiLib</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Copyright>Copyright © 2019 Vasily Vasilyev (vasar007@yandex.ru)</Copyright>
+    <Copyright>© 2019 Vasily Vasilyev (vasar007@yandex.ru)</Copyright>
     <ApplicationIcon></ApplicationIcon>
   </PropertyGroup>
 
