@@ -3,6 +3,7 @@
 [![nuget](https://img.shields.io/nuget/v/SteamWebApiLib.svg)](https://www.nuget.org/packages/SteamWebApiLib)
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/Vasar007/SteamWebApiLib/blob/master/LICENSE)
 [![AppVeyor branch](https://img.shields.io/appveyor/ci/Vasar007/SteamWebApiLib/master.svg)](https://ci.appveyor.com/project/Vasar007/steamwebapiLib)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FVasar007%2FSteamWebApiLib.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FVasar007%2FSteamWebApiLib?ref=badge_shield)
 
 SteamWepApiLib is a .NET wrapper for the Steam API. It provides a set of methods to retrieve various data from the Steam API. Library can interact with Steam Strorefront API and Steam Web API (each API provides a different set of data).
 
@@ -82,6 +83,9 @@ As a basis for project were taken [SteamStorefrontAPI](https://github.com/mmuffi
 ## License information
 
 This project is licensed under the terms of the [Apache License 2.0](LICENSE).
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FVasar007%2FSteamWebApiLib.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FVasar007%2FSteamWebApiLib?ref=badge_large)
 
 ### Third party software and libraries used
 
